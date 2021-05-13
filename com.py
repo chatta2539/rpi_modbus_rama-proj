@@ -1,5 +1,7 @@
 from pymodbus.client.sync import ModbusTcpClient as ModbusClient
 from pymodbus.transaction import ModbusRtuFramer
+from pymodbus.client.sync import ModbusSerialClient as ModbusClient #initialize a serial RTU client instance
+
 import time
 import json
 import paho.mqtt.publish as publish
@@ -42,7 +44,8 @@ def readmodbus(ip, add):
 
     
 def readmodbusrtu(ip, add):
-    client = ModbusClient(method='rtu', port='/dev/ptyp0', timeout=1, baudrate=9600)
+    client= ModbusClient(method = "rtu", port="/dev/ttyUSB0",stopbits = 1, bytesize = 8, parity = 'O', baudrate = 9600)
+
     client.connect()
     rr = client.read_holding_registers(0x0000, 50,unit=add)
     print(rr)
@@ -72,47 +75,3 @@ while True:
         print("No 2",err)
         mqttc.publish("raeh/rama/md2/pwm/err", str(err))
     time.sleep(1)
-
-    # try:
-    #     print(readmodbus('192.168.1.139', 3))
-    # except Exception as err:
-    #         print("No 3",err)
-    # time.sleep(1)
-    # try:
-    #     print(readmodbus('192.168.1.139', 4))
-    # except Exception as err:
-    #         print("No 4",err)
-    # time.sleep(1)
-    # try:
-    #     print(readmodbus('192.168.1.139', 5))
-    # except Exception as err:
-    #         print("No 5",err)
-    # time.sleep(1)
-    # try:
-    #     print(readmodbus('192.168.1.139', 6))
-    # except Exception as err:
-    #         print("No 6",err)
-    # time.sleep(1)
-    # try:
-    #     print(readmodbus('192.168.1.139', 7))
-    # except Exception as err:
-    #         print("No 7",err)
-    # time.sleep(1)
-    # try:
-    #     print(readmodbus('192.168.1.139', 8))
-    # except Exception as err:
-    #         print("No 8",err)
-    # time.sleep(1)
-
-
-# while True:
-
-    # rr = client.read_holding_registers(0x0000,50,unit=1)
-    # print(rr)
-    # print(rr.registers)
-    
-    # rr = client.read_holding_registers(0x0000,50,unit=2)
-    # print(rr)
-    # print(rr.registers)
-    
-    # time.sleep(1)
