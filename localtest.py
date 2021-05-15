@@ -1,27 +1,13 @@
 from pymodbus.client.sync import ModbusTcpClient as ModbusClient
 from pymodbus.client.sync import ModbusSerialClient as ModbusClientRtu
+
 from pymodbus.transaction import ModbusRtuFramer
 import time
 import json
 import paho.mqtt.publish as publish
 import paho.mqtt.client as mqtt
 import urllib.request
-import logging
-from logging.handlers import RotatingFileHandler
-
-
-# log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(funcName)s(%(lineno)d) %(message)s')
-
-# logFile = '/home/pi/Desktop/log/logfile.log'
-
-# my_handler = RotatingFileHandler(logFile, mode='a', maxBytes=5*1024*1024, backupCount=999, encoding=None, delay=0)
-# my_handler.setFormatter(log_formatter)
-# my_handler.setLevel(logging.INFO)
-
-# app_log = logging.getLogger('root')
-# app_log.setLevel(logging.INFO)
-
-# app_log.addHandler(my_handler)
+import datetime
 
 def readmodbus(ip, add):
     client = ModbusClient(ip, 502, framer=ModbusRtuFramer)
@@ -78,44 +64,69 @@ def readrtu(add):
     y = json.dumps(x)
     return y
 
-ip_mb = ['192.168.100.111', '192.168.100.115']
-ip_mb_add = [1, 2]
+bk_mqtt_tcp = ["raeh/rama/test2/pwm", "raeh/rama/test3/pwm"]
+bk_mqtt_tcp_err = ["raeh/rama/test2/pwm/err", "raeh/rama/test2/pwm/err"]
+add_mb_tcp = [1, 2]
+ip_mb_tcp = ['192.168.137.1', '192.168.137.1']
 
-print(len(ip_mb))
-for i in range(len(ip_mb)):
-    print(ip_mb[i])
-    print(ip_mb_add[i])
+add_mb_rtu = [1, 2]
+bk_mqtt_rtu = ["raeh/rama/test4/pwm", "raeh/rama/test4/pwm"]
+bk_mqtt_rtu_err = ["raeh/rama/test4/pwm/err", "raeh/rama/test4/pwm/err"]
+
+for i in range(len(bk_mqtt_tcp)):
+    print(bk_mqtt_tcp[i] + " " + bk_mqtt_tcp_err[i] + " " + str(add_mb_tcp[i]) + " : " + ip_mb_tcp[i])
 
 def task(sleep):
+    print(bk_mqtt_tcp[1])
+    # print(readmodbus('192.168.137.1', 1))
 
+    # print("Start loop")
+    for x in range(len(bk_mqtt_tcp)):
+        print(x)
+        data = ""
+        try:
+            data = readmodbus(ip_mb_tcp[x], add_mb_tcp[x])
+            print(data)
+        except Exception as err:
+            print(err) 
+            mqttc.publish(bk_mqtt_tcp_err[x], str(err)) 
+        
+        if data != "":
+            try:
+                mqttc.publish(bk_mqtt_tcp[x], data)
+            except Exception as err:
+                mqttc.publish(bk_mqtt_tcp_err[x], str(err))
+        time.sleep(sleep)
+
+    for x in range(len(add_mb_rtu)):
+        print(x)
+        data_rtu = ""
+        try:
+            data_rtu = readrtu(add_mb_rtu[x])
+            print(data_rtu)
+        except Exception as err:
+            print(err) 
+            mqttc.publish(bk_mqtt_rtu_err[x], str(err))
+        
+        if data_rtu != "":
+            try:
+                mqttc.publish(bk_mqtt_rtu[x], data)
+            except Exception as err:
+                mqttc.publish(bk_mqtt_rtu_err[x], str(err))
     
-     
 
-    try:
-        mqttc.publish("raeh/rama/md1/pwm", readmodbus('192.168.100.115', 1))
-        app_log.info("md1 Read OK")
-    except Exception as err:
-        print("No 1",err)
-        mqttc.publish("raeh/rama/md1/pwm/err", str(err))
-        app_log.error("md1 Read error : " + str(err))
-    time.sleep(sleep)
 
-    try:
-        mqttc.publish("raeh/rama/md2/pwm", readmodbus('192.168.100.115', 2))
-        app_log.info("md2 Read OK")
-    except Exception as err:
-        print("No 2",err)
-        mqttc.publish("raeh/rama/md2/pwm/err", str(err))
-        app_log.error("md2 Read error : " + str(err))
-    time.sleep(sleep)
+    # try:
+    #     mqttc.publish("raeh/rama/floor1/pwm", readrtu(2))
+    # except Exception as err:
+    #     mqttc.publish("raeh/rama/floor1/pwm/err", str(err))
+    # time.sleep(sleep)
 
-    try:
-        mqttc.publish("raeh/rama/md3/pwm", readrtu(1))
-        app_log.info("md3 Read OK")
-    except Exception as err:
-        mqttc.publish("raeh/rama/md3/pwm/err", str(err))
-        app_log.error("md3 Read error : " + str(err))
-    time.sleep(sleep)
+    # try:
+    #     mqttc.publish("raeh/rama/building4/pwm", readrtu(19))
+    # except Exception as err:
+    #     mqttc.publish("raeh/rama/building4/pwm/err", str(err))
+    # time.sleep(sleep)
 
 def internet_on():
     try:
@@ -124,17 +135,11 @@ def internet_on():
     except:
         return False
 
-# while True:
+mqttc = mqtt.Client()
+mqttc.connect("54.254.158.8", 1883, 60)
+mqttc.loop_start() 
 
-#     while internet_on():
-#         try:
-#             mqttc = mqtt.Client()
-#             mqttc.connect("54.254.158.8", 1883, 60)
-#             mqttc.loop_start()
-#         except Exception as err:
-#             print("Internet connection: ", err)
-#         time.sleep(1)
-#         task(1)
-    
 
+while True:
+    task(0.5)
 
