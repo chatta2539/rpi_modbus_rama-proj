@@ -1,16 +1,11 @@
 from pymodbus.client.sync import ModbusTcpClient as ModbusClient
-from pymodbus.client.sync import ModbusSerialClient as ModbusClientRtu #initialize a serial RTU client instance
-
+from pymodbus.client.sync import ModbusSerialClient as ModbusClientRtu
 from pymodbus.transaction import ModbusRtuFramer
 import time
 import json
 import paho.mqtt.publish as publish
 import paho.mqtt.client as mqtt
 import urllib.request
-
-
-
-
 
 def readmodbus(ip, add):
     client = ModbusClient(ip, 502, framer=ModbusRtuFramer)

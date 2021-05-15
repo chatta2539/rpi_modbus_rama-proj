@@ -127,12 +127,10 @@ while True:
             mqttc = mqtt.Client()
             mqttc.connect("54.254.158.8", 1883, 60)
             mqttc.loop_start()
-            # print("Connected" + str(datetime.datetime.now()))
         except Exception as err:
             print("Internet connection: ", err)
         task(0.5)
         mqttc.disconnect()
-        # print("Disconnected"  + str(datetime.datetime.now()))
     
 
 
