@@ -1,15 +1,13 @@
 from pymodbus.client.sync import ModbusTcpClient as ModbusClient
-from pymodbus.client.sync import ModbusSerialClient as ModbusClientRtu #initialize a serial RTU client instance
+from pymodbus.client.sync import ModbusSerialClient as ModbusClientRtu
 
 from pymodbus.transaction import ModbusRtuFramer
 import time
 import json
 import paho.mqtt.publish as publish
 import paho.mqtt.client as mqtt
-
-mqttc = mqtt.Client()
-mqttc.connect("54.254.158.8", 1883, 60)
-mqttc.loop_start()
+import urllib.request
+import datetime
 
 def readmodbus(ip, add):
     client = ModbusClient(ip, 502, framer=ModbusRtuFramer)
@@ -114,10 +112,27 @@ def task(sleep):
     except Exception as err:
         mqttc.publish("raeh/rama/building4/pwm/err", str(err))
     time.sleep(sleep)
+
+def internet_on():
+    try:
+        urllib.request.urlopen('https://www.google.com/', timeout=2)
+        return True
+    except:
+        return False
     
 while True:
 
-    task(1)
+    while internet_on():
+        try:
+            mqttc = mqtt.Client()
+            mqttc.connect("54.254.158.8", 1883, 60)
+            mqttc.loop_start()
+            # print("Connected" + str(datetime.datetime.now()))
+        except Exception as err:
+            print("Internet connection: ", err)
+        task(0.5)
+        mqttc.disconnect()
+        # print("Disconnected"  + str(datetime.datetime.now()))
     
 
 

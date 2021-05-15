@@ -6,10 +6,11 @@ import time
 import json
 import paho.mqtt.publish as publish
 import paho.mqtt.client as mqtt
+import urllib.request
 
-mqttc = mqtt.Client()
-mqttc.connect("54.254.158.8", 1883, 60)
-mqttc.loop_start()
+
+
+
 
 def readmodbus(ip, add):
     client = ModbusClient(ip, 502, framer=ModbusRtuFramer)
@@ -68,31 +69,46 @@ def readrtu(add):
 
 def task(sleep):
     try:
-        print(readmodbus('192.168.1.139', 1))
-        mqttc.publish("raeh/rama/md1/pwm", readmodbus('192.168.1.139', 1))
+        # print(readmodbus('192.168.1.100', 1))
+        mqttc.publish("raeh/rama/md1/pwm", readmodbus('192.168.1.100', 1))
     except Exception as err:
         print("No 1",err)
         mqttc.publish("raeh/rama/md1/pwm/err", str(err))
     time.sleep(sleep)
 
     try:
-        print(readmodbus('192.168.1.139', 2))
-        mqttc.publish("raeh/rama/md2/pwm", readmodbus('192.168.1.139', 2))
+        # print(readmodbus('192.168.1.100', 2))
+        mqttc.publish("raeh/rama/md2/pwm", readmodbus('192.168.1.100', 2))
     except Exception as err:
         print("No 2",err)
         mqttc.publish("raeh/rama/md2/pwm/err", str(err))
     time.sleep(sleep)
 
     try:
-        print(readrtu(1))
+        # print(readrtu(1))
         mqttc.publish("raeh/rama/md3/pwm", readrtu(1))
     except Exception as err:
         mqttc.publish("raeh/rama/md3/pwm/err", str(err))
     time.sleep(sleep)
-    
+
+def internet_on():
+    try:
+        urllib.request.urlopen('https://www.google.com/', timeout=2)
+        return True
+    except:
+        return False
+
 while True:
 
-    task(1)
+    while internet_on():
+        try:
+            mqttc = mqtt.Client()
+            mqttc.connect("54.254.158.8", 1883, 60)
+            mqttc.loop_start()
+        except Exception as err:
+            print("Internet connection: ", err)
+        time.sleep(1)
+        task(1)
     
 
 
