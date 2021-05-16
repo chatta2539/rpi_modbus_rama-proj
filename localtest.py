@@ -9,6 +9,8 @@ import paho.mqtt.client as mqtt
 import urllib.request
 import datetime
 
+time.sleep(20)
+
 def readmodbus(ip, add):
     client = ModbusClient(ip, 502, framer=ModbusRtuFramer)
     client.connect()
