@@ -35,14 +35,19 @@ def readmodbus(ip, add):
     "Hz": r5.registers[2]*0.01
     }
     y = json.dumps(x)
+    print(y)
     return y
 
 def readrtu(add):
     client = ModbusClientRtu(method = "rtu", port="/dev/ttyUSB0",stopbits = 1, bytesize = 8, parity = 'O', baudrate = 9600)
     r1 = client.read_holding_registers(0, 10, unit= add)
+    time.sleep(0.01)
     r2 = client.read_holding_registers(10, 10, unit= add)
+    time.sleep(0.01)
     r3 = client.read_holding_registers(20, 2, unit= add)
+    time.sleep(0.01)
     r4 = client.read_holding_registers(30, 10, unit= add)
+    time.sleep(0.01)
     r5 = client.read_holding_registers(40, 3, unit= add)
     x = {
     "Va": r1.registers[0]*0.01,
@@ -62,26 +67,27 @@ def readrtu(add):
     "Hz": r5.registers[2]*0.01
     }
     y = json.dumps(x)
+    
     return y
 
 def task(sleep):
-    try:
-        mqttc.publish("raeh/rama/floor2/pwm", readmodbus('192.168.100.12', 20))
-    except Exception as err:
-        mqttc.publish("raeh/rama/floor2/pwm/err", str(err))
-    time.sleep(sleep)
+    # try:
+    #     mqttc.publish("raeh/rama/floor2/pwm", readmodbus('192.168.100.12', 20))
+    # except Exception as err:
+    #     mqttc.publish("raeh/rama/floor2/pwm/err", str(err))
+    # time.sleep(sleep)
 
-    try:
-        mqttc.publish("raeh/rama/floor3/pwm", readmodbus('192.168.100.13', 45))
-    except Exception as err:
-        mqttc.publish("raeh/rama/floor3/pwm/err", str(err))
-    time.sleep(sleep)
+    # try:
+    #     mqttc.publish("raeh/rama/floor3/pwm", readmodbus('192.168.100.13', 45))
+    # except Exception as err:
+    #     mqttc.publish("raeh/rama/floor3/pwm/err", str(err))
+    # time.sleep(sleep)
 
-    try:
-        mqttc.publish("raeh/rama/floor4/pwm", readmodbus('192.168.100.14', 70))
-    except Exception as err:
-        mqttc.publish("raeh/rama/floor4/pwm/err", str(err))
-    time.sleep(sleep)
+    # try:
+    #     mqttc.publish("raeh/rama/floor4/pwm", readmodbus('192.168.100.14', 70))
+    # except Exception as err:
+    #     mqttc.publish("raeh/rama/floor4/pwm/err", str(err))
+    # time.sleep(sleep)
 
     try:
         mqttc.publish("raeh/rama/floor5/pwm", readmodbus('192.168.100.15', 95))
@@ -89,29 +95,29 @@ def task(sleep):
         mqttc.publish("raeh/rama/floor5/pwm/err", str(err))
     time.sleep(sleep)
 
-    try:
-        mqttc.publish("raeh/rama/floor6/pwm", readmodbus('192.168.100.16', 120))
-    except Exception as err:
-        mqttc.publish("raeh/rama/floor6/pwm/err", str(err))
-    time.sleep(sleep)
+    # try:
+    #     mqttc.publish("raeh/rama/floor6/pwm", readmodbus('192.168.100.16', 120))
+    # except Exception as err:
+    #     mqttc.publish("raeh/rama/floor6/pwm/err", str(err))
+    # time.sleep(sleep)
 
-    try:
-        mqttc.publish("raeh/rama/floor7/pwm", readmodbus('192.168.100.17', 145))
-    except Exception as err:
-        mqttc.publish("raeh/rama/floor7/pwm/err", str(err))
-    time.sleep(sleep)
+    # try:
+    #     mqttc.publish("raeh/rama/floor7/pwm", readmodbus('192.168.100.17', 145))
+    # except Exception as err:
+    #     mqttc.publish("raeh/rama/floor7/pwm/err", str(err))
+    # time.sleep(sleep)
 
-    try:
-        mqttc.publish("raeh/rama/floor1/pwm", readrtu(2))
-    except Exception as err:
-        mqttc.publish("raeh/rama/floor1/pwm/err", str(err))
-    time.sleep(sleep)
+    # try:
+    #     mqttc.publish("raeh/rama/floor1/pwm", readrtu(2))
+    # except Exception as err:
+    #     mqttc.publish("raeh/rama/floor1/pwm/err", str(err))
+    # time.sleep(sleep)
 
-    try:
-        mqttc.publish("raeh/rama/building4/pwm", readrtu(19))
-    except Exception as err:
-        mqttc.publish("raeh/rama/building4/pwm/err", str(err))
-    time.sleep(sleep)
+    # try:
+    #     mqttc.publish("raeh/rama/building4/pwm", readrtu(19))
+    # except Exception as err:
+    #     mqttc.publish("raeh/rama/building4/pwm/err", str(err))
+    # time.sleep(sleep)
 
 def internet_on():
     try:
