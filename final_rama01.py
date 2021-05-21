@@ -27,8 +27,7 @@ time.sleep(20)
 mqttc = mqtt.Client()
 mqttc.connect("54.254.158.8", 1883, 60)
 mqttc.loop_start()
-floor2 = ModbusClient("192.168.100.12", 502, framer=ModbusRtuFramer)
-floor2.connect()
+
 floor3 = ModbusClient("192.168.100.13", 502, framer=ModbusRtuFramer)
 floor3.connect()
 floor4 = ModbusClient("192.168.100.14", 502, framer=ModbusRtuFramer)
@@ -48,12 +47,11 @@ data5 = ""
 data6 = ""
 data7 = ""
 dataMain = ""
-data2 = ""
-list_data = [dataM, data1, data3, data4, data5, data6, data7, dataMain, data2]
+list_data = [dataM, data1, data3, data4, data5, data6, data7, dataMain]
 bk_mqtt = ["raeh/rama/building4/pwm", "raeh/rama/floor1/pwm", "raeh/rama/floor3/pwm", "raeh/rama/floor4/pwm",
-"raeh/rama/floor5/pwm", "raeh/rama/floor6/pwm", "raeh/rama/floor7/pwm", "raeh/rama/MDB/pwm", "raeh/rama/floor2/pwm"]
+"raeh/rama/floor5/pwm", "raeh/rama/floor6/pwm", "raeh/rama/floor7/pwm", "raeh/rama/MDB/pwm"]
 bk_mqtt_err = ["raeh/rama/building4/pwm/err", "raeh/rama/floor1/pwm/err", "raeh/rama/floor3/pwm/err", "raeh/rama/floor4/pwm/err",
-"raeh/rama/floor5/pwm/err", "raeh/rama/floor6/pwm/err", "raeh/rama/floor7/pwm/err", "raeh/rama/MDB/pwm/err", "raeh/rama/floor2/pwm/err"]
+"raeh/rama/floor5/pwm/err", "raeh/rama/floor6/pwm/err", "raeh/rama/floor7/pwm/err", "raeh/rama/MDB/pwm/err"]
 def readmodbus(server, add):
     r1 = server.read_holding_registers(0, 50, unit= add)
     x = {
@@ -168,12 +166,6 @@ def taskModbus():
     except Exception as err:
         print(err)
         mqttc.publish("raeh/rama/MDB/pwm/err", str(err))
-    try:
-        list_data[8] = readmodbus(floor2, 20)
-        print("Floor 2 : ", list_data[2])
-    except Exception as err:
-        print(err)
-        mqttc.publish("raeh/rama/floor2/pwm/err", str(err))
 
 
 def taskMQTT():
@@ -187,7 +179,7 @@ def taskMQTT():
 
 previous_time = time.time() 
 while True:
-    if time.time()-previous_time >= 60:
+    if time.time()-previous_time >= 15:
         previous_time = time.time()
         taskMQTT()
     else:

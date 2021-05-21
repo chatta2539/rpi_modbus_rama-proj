@@ -22,6 +22,8 @@ from logging.handlers import RotatingFileHandler
 # app_log.setLevel(logging.INFO)
 
 # app_log.addHandler(my_handler)
+floor2 = ModbusClient("192.168.100.12", 502, framer=ModbusRtuFramer)
+floor2.connect()
 floor3 = ModbusClient("192.168.100.13", 502, framer=ModbusRtuFramer)
 floor3.connect()
 floor4 = ModbusClient("192.168.100.14", 502, framer=ModbusRtuFramer)
@@ -83,11 +85,11 @@ def readrtu(add):
 client = ModbusClientRtu(method = "rtu", port="/dev/ttyUSB0",stopbits = 1, bytesize = 8, parity = 'N', baudrate = 9600)
 
 while True:
-    # try:
-    #     data3 = readmodbus(floor3, 45)
-    #     print("Floor 3 : ", data3)
-    # except Exception as err:
-    #     print(err)
+    try:
+        data2 = readmodbus(floor2, 20)
+        print("Floor 2 : ", data2)
+    except Exception as err:
+        print(err)
     # try:
     #     data4 = readmodbus(floor4, 70)
     #     print("Floor 4 : ", data4)
@@ -96,20 +98,20 @@ while True:
     
     # time.sleep(0.1)
 
-    try:
-        r1 = client.read_holding_registers(0, 50, unit= 19)
-        print("Master")
-        print(r1.registers)
-        print(len(r1.registers))
-    except Exception as err:
-        print(err)
-    try:
-        r2 = client.read_holding_registers(0, 50, unit= 2)
-        print("Floor 1")
-        print(r2.registers)
-        print(len(r2.registers))
-    except Exception as err:
-        print(err)
+    #try:
+    #    r1 = client.read_holding_registers(110, 15, unit= 1)
+    #    print("Master")
+     #   print(r1.registers)
+     #   print(len(r1.registers))
+   # except Exception as err:
+    #    print(err)
+   # try:
+     #   r2 = client.read_holding_registers(0, 50, unit= 2)
+    #    print("Floor 1")
+   #     print(r2.registers)
+  #      print(len(r2.registers))
+ #   except Exception as err:
+#        print(err)
     # time.sleep(0.1)
 
 # client = ModbusClient("192.168.100.15", 502, framer=ModbusRtuFramer)
